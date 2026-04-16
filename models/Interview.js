@@ -1,32 +1,35 @@
 const mongoose = require('mongoose');
 
 const interviewSchema = new mongoose.Schema({
-  jobId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'JobPosting',
-    required: true,
-  },
-  candidateId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: true
   },
-  employerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  scheduledDate: {
-    type: Date,
-    required: true,
-  },
-  meetingLink: String, // Zoom/Google Meet
-  status: {
+  company: {
     type: String,
-    enum: ['Pending', 'Scheduled', 'Cancelled', 'Completed'],
-    default: 'Pending',
+    required: [true, 'Company name is required'],
+    trim: true
   },
-  notes: String
-}, { timestamps: true });
+  role: {
+    type: String,
+    required: [true, 'Job role is required']
+  },
+  date: {
+    type: String, // Matches your frontend "DD/MM/YYYY" format
+    required: true
+  },
+  color: {
+    type: String,
+    default: '#B4B9E8'
+  },
+  notes: {
+    type: String,
+    default: ''
+  }
+}, { 
+  timestamps: true // Automatically adds createdAt and updatedAt
+});
 
+// CRITICAL: Use module.exports for CommonJS compatibility
 module.exports = mongoose.model('Interview', interviewSchema);

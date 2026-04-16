@@ -6,6 +6,7 @@ const resumeRoutes = require('./routes/resumeRoutes');
 const jobPostingRoutes = require('./routes/jobPostingRoutes');
 const authRoutes = require('./routes/authRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const interviewRoutes = require('./routes/interviewRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 1008;
@@ -42,6 +43,7 @@ app.use('/api/jobs', jobPostingRoutes);
 app.use('/api/auth', authRoutes);
 
 app.use('/api/search', searchRoutes);
+app.use('/api/interview', interviewRoutes);
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
