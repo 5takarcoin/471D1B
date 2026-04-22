@@ -1,5 +1,6 @@
 const express = require('express');
 const jobPostingController = require('../controllers/jobPostingController');
+const JobPosting = require("../models/JobPosting");
 
 const router = express.Router();
 
@@ -16,6 +17,89 @@ router.post('/create', jobPostingController.createJobPosting);
  * API 2.2: Get Job Posting by ID
  * GET /api/jobs/:jobId
  */
+
+// GET /api/jobs/recommendations/:userId
+router.get("/recommendations/:userId", async (req, res) => {
+  try {
+    const Groq = require("groq-sdk");
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const Profile = require("../models/Profile");
+
+    // get user profile
+    const profile = await Profile.findOne({ userId: req.params.userId });
+    if (!profile || !profile.skills.length) {
+      return res.status(404).json({ success: false, message: "No skills found in profile" });
+    }
+
+    // fetch all open jobs
+    const jobs = await JobPosting.find({ status: "Open" });
+    if (!jobs.length) {
+      return res.status(404).json({ success: false, message: "No jobs found" });
+    }
+
+    // prepare simplified job list for Groq
+    const jobList = jobs.map(j => ({
+      id: j._id,
+      title: j.jobTitle,
+      requiredSkills: j.requiredSkills,
+      description: j.description.substring(0, 200), // trim to save tokens
+      location: j.location,
+      jobType: j.jobType,
+    }));
+
+    const prompt = `
+      You are a job recommendation engine.
+      
+      Candidate profile:
+      - Name: ${profile.name || "Candidate"}
+      - Skills: ${profile.skills.join(", ")}
+      - Experience: ${profile.experience || "Not specified"}
+      - Education: ${profile.education || "Not specified"}
+
+      Here are the available jobs:
+      ${JSON.stringify(jobList, null, 2)}
+
+      Analyze the candidate's profile against each job and return the top 5 most suitable jobs.
+      
+      Respond ONLY with a valid JSON array, no explanation, no markdown, no backticks. Like this:
+      [
+        {
+          "id": "job_id_here",
+          "matchScore": 85,
+          "reason": "Your React and Node.js skills align well with this role..."
+        }
+      ]
+      
+      Order by matchScore descending. matchScore should be 0-100.
+    `;
+
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    // parse Groq response
+    const raw = response.choices[0].message.content;
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const ranked = JSON.parse(clean);
+
+    // attach full job details to each recommendation
+    const result = ranked.map(rec => {
+      const fullJob = jobs.find(j => j._id.toString() === rec.id.toString());
+      return {
+        ...fullJob.toObject(),
+        matchScore: rec.matchScore,
+        reason: rec.reason,
+      };
+    }).filter(j => j._id); // remove any unmatched
+
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error("Recommendation error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 router.get('/:jobId', jobPostingController.getJobPosting);
 
 /**
@@ -62,6 +146,7 @@ router.post('/search/skills', jobPostingController.searchJobsBySkills);
  * PUT /api/jobs/:jobId/apply
  */
 router.put('/:jobId/apply', jobPostingController.incrementApplicants);
+
 
 
 
