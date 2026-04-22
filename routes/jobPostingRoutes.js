@@ -63,4 +63,6 @@ router.post('/search/skills', jobPostingController.searchJobsBySkills);
  */
 router.put('/:jobId/apply', jobPostingController.incrementApplicants);
 
+
+
 module.exports = router;

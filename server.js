@@ -7,6 +7,9 @@ const jobPostingRoutes = require('./routes/jobPostingRoutes');
 const authRoutes = require('./routes/authRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
+const coverLetterRoute = require("./routes/coverLetter");
+const profileRoute = require("./routes/profile");
+
 
 const app = express();
 const PORT = process.env.PORT || 1008;
@@ -44,6 +47,11 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/search', searchRoutes);
 app.use('/api/interview', interviewRoutes);
+
+app.use("/api/cover-letter", coverLetterRoute);
+app.use("/api/profile", profileRoute);
+
+
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
@@ -94,14 +102,7 @@ app.listen(PORT, HOST, () => {
   console.log(`Host: ${HOST}`);
   console.log(`Port: ${PORT}`);
   console.log(`URL: http://localhost:${PORT}`);
-  console.log(`========================================\n`);
-  console.log(`Available Endpoints:`);
-  console.log(`  - GET  http://localhost:${PORT}/api/health`);
-  console.log(`  - POST http://localhost:${PORT}/api/resumes/upload`);
-  console.log(`  - GET  http://localhost:${PORT}/api/resumes/:resumeId`);
-  console.log(`  - POST http://localhost:${PORT}/api/jobs/create`);
-  console.log(`  - GET  http://localhost:${PORT}/api/jobs`);
-  console.log(`\n`);
+
 });
 
 module.exports = app;
