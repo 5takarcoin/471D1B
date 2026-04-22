@@ -1,9 +1,16 @@
 const mongoose = require('mongoose');
 
 const interviewSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  applicantId: {
+    type: String,
+    required: true
+  },
+  employerId: {
+    type: String,
+    required: true
+  },
+  jobId: {
+    type: String,
     required: true
   },
   company: {
@@ -16,7 +23,7 @@ const interviewSchema = new mongoose.Schema({
     required: [true, 'Job role is required']
   },
   date: {
-    type: String, // Matches your frontend "DD/MM/YYYY" format
+    type: String,
     required: true
   },
   color: {
@@ -27,9 +34,8 @@ const interviewSchema = new mongoose.Schema({
     type: String,
     default: ''
   }
-}, { 
-  timestamps: true // Automatically adds createdAt and updatedAt
+}, {
+  timestamps: true
 });
 
-// CRITICAL: Use module.exports for CommonJS compatibility
 module.exports = mongoose.model('Interview', interviewSchema);

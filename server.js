@@ -9,7 +9,7 @@ const searchRoutes = require('./routes/searchRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const coverLetterRoute = require("./routes/coverLetter");
 const profileRoute = require("./routes/profile");
-
+const applicationRoutes = require("./routes/applicationRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 1008;
@@ -50,6 +50,7 @@ app.use('/api/interview', interviewRoutes);
 
 app.use("/api/cover-letter", coverLetterRoute);
 app.use("/api/profile", profileRoute);
+app.use("/api/applications", applicationRoutes);
 
 
 
