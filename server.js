@@ -20,11 +20,11 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: [
+    'https://anv471.netlify.app'
+  ],
+  credentials: true
 }));
-app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
