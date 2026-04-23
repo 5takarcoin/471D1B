@@ -20,9 +20,8 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: [
-    'https://anv471.netlify.app'
-  ],
+  origin: 'https://anv471.netlify.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 app.use(express.json());
